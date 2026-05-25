@@ -1,3 +1,5 @@
+package view.user;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,7 +20,7 @@ public class UserRegistrationFrame extends JFrame {
     public UserRegistrationFrame() {
         setTitle("Cadastro de Usuário");
         setSize(400, 450);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
     }
