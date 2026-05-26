@@ -1,3 +1,4 @@
+import view.menu.MainMenuView;
 import view.user.UserLoginFrame;
 
 import javax.swing.SwingUtilities;
@@ -7,7 +8,7 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new UserLoginFrame().setVisible(true);
+                new MainMenuView().setVisible(true);
             }
         });
     }
