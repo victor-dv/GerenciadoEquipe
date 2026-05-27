@@ -1,6 +1,7 @@
 package dao;
 
 import model.Equipe;
+import model.Usuario;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -8,20 +9,36 @@ import java.util.List;
 
 public class EquipeDAO {
     public void create(Equipe equipe) throws SQLException {
-        String sql = "INSERT INTO equipes (nome, descricao) VALUES (?, ?)";
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, equipe.getNome());
-            stmt.setString(2, equipe.getDescricao());
-            stmt.executeUpdate();
+        String sqlEquipe = "INSERT INTO equipes (nome, descricao) VALUES (?, ?)";
+        String sqlMembros = "INSERT INTO equipe_usuarios (equipe_id, usuario_id) VALUES (?, ?)";
+        
+        try (Connection conn = ConnectionFactory.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement stmtEquipe = conn.prepareStatement(sqlEquipe, Statement.RETURN_GENERATED_KEYS)) {
+                stmtEquipe.setString(1, equipe.getNome());
+                stmtEquipe.setString(2, equipe.getDescricao());
+                stmtEquipe.executeUpdate();
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    equipe.setIdEquipe(generatedKeys.getInt(1));
+                try (ResultSet generatedKeys = stmtEquipe.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        equipe.setIdEquipe(generatedKeys.getInt(1));
+                    }
                 }
+
+                try (PreparedStatement stmtMembros = conn.prepareStatement(sqlMembros)) {
+                    for (Usuario membro : equipe.getMembros()) {
+                        stmtMembros.setInt(1, equipe.getIdEquipe());
+                        stmtMembros.setInt(2, membro.getId());
+                        stmtMembros.addBatch();
+                    }
+                    stmtMembros.executeBatch();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
         }
-        // Nota: A vinculação de membros exigiria uma tabela associativa não presente no SQL original.
     }
 
     public List<Equipe> findAll() throws SQLException {

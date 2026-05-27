@@ -16,23 +16,17 @@ public class ProjetoController {
         this.projetoDAO = new ProjetoDAO();
     }
 
-    public boolean cadastrarProjeto(String nome, String descricao, String dataInicioStr, String dataFimStr, String statusStr, Usuario gerente) {
-        try {
-            Projeto p = new Projeto();
-            p.setNome(nome);
-            p.setDescricao(descricao);
-            p.setDataInicio(LocalDate.parse(dataInicioStr, formatter));
-            if (dataFimStr != null && !dataFimStr.isEmpty()) {
-                p.setDataFinalPrevisto(LocalDate.parse(dataFimStr, formatter));
-            }
-            p.setStatus(StatusProjeto.fromString(statusStr));
-            p.setGerente(gerente);
-            
-            projetoDAO.create(p);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+    public void cadastrarProjeto(String nome, String descricao, String dataInicioStr, String dataFimStr, String statusStr, Usuario gerente) throws Exception {
+        Projeto p = new Projeto();
+        p.setNome(nome);
+        p.setDescricao(descricao);
+        p.setDataInicio(LocalDate.parse(dataInicioStr, formatter));
+        if (dataFimStr != null && !dataFimStr.isEmpty()) {
+            p.setDataFinalPrevisto(LocalDate.parse(dataFimStr, formatter));
         }
+        p.setStatus(StatusProjeto.fromString(statusStr));
+        p.setGerente(gerente);
+        
+        projetoDAO.create(p);
     }
 }

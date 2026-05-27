@@ -32,3 +32,11 @@ create table equipes (
     descricao text,
     data_cadastro datetime default current_timestamp
 );
+
+create table equipe_usuarios (
+	equipe_id int not null,
+    usuario_id int not null,
+    primary key (equipe_id, usuario_id),
+    foreign key (equipe_id) references equipes(id_equipe),
+    foreign key (usuario_id) references users(id)
+);

@@ -1,9 +1,14 @@
 package view.project;
 
+import controller.ProjetoController;
+import controller.UsuarioController;
+import model.Usuario;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class ProjectRegistrationFrame extends JFrame {
 
@@ -12,16 +17,36 @@ public class ProjectRegistrationFrame extends JFrame {
     private JTextField txtDataInicio;
     private JTextField txtDataTermino;
     private JComboBox<String> comboStatus;
-    private JComboBox<String> comboGerenteResponsavel;
+    private JComboBox<Usuario> comboGerenteResponsavel;
     private JButton btnCadastrar;
     private JButton btnCancelar;
+    
+    private ProjetoController projetoController;
+    private UsuarioController usuarioController;
 
     public ProjectRegistrationFrame() {
+        projetoController = new ProjetoController();
+        usuarioController = new UsuarioController();
+        
         setTitle("Cadastro de Projeto");
         setSize(450, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        loadGerentes();
+    }
+
+    private void loadGerentes() {
+        try {
+            List<Usuario> usuarios = usuarioController.listarUsuarios();
+            comboGerenteResponsavel.addItem(null); // Para o "Selecione..."
+            for (Usuario u : usuarios) {
+                // Poderíamos filtrar por perfil aqui se desejado
+                comboGerenteResponsavel.addItem(u);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao carregar gerentes: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void initComponents() {
@@ -66,7 +91,7 @@ public class ProjectRegistrationFrame extends JFrame {
         gbc.gridx = 0; gbc.gridy = 4;
         panel.add(new JLabel("Status:"), gbc);
         gbc.gridx = 1;
-        String[] statusOpcoes = {"Planejado", "Em Andamento", "Concluído", "Cancelado"};
+        String[] statusOpcoes = {"Planejado", "Em_Andamento", "Concluido", "Cancelado"};
         comboStatus = new JComboBox<>(statusOpcoes);
         panel.add(comboStatus, gbc);
 
@@ -74,9 +99,7 @@ public class ProjectRegistrationFrame extends JFrame {
         gbc.gridx = 0; gbc.gridy = 5;
         panel.add(new JLabel("Gerente Responsável:"), gbc);
         gbc.gridx = 1;
-        // Simulação de lista de gerentes
-        String[] gerentes = {"Selecione...", "Carlos Silva", "Ana Souza", "Roberto Gomes"};
-        comboGerenteResponsavel = new JComboBox<>(gerentes);
+        comboGerenteResponsavel = new JComboBox<>();
         panel.add(comboGerenteResponsavel, gbc);
 
         // Botões
@@ -97,10 +120,23 @@ public class ProjectRegistrationFrame extends JFrame {
         btnCadastrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (txtNomeProjeto.getText().isEmpty() || comboGerenteResponsavel.getSelectedIndex() == 0) {
+                String nome = txtNomeProjeto.getText();
+                String descricao = txtDescricao.getText();
+                String dataInicio = txtDataInicio.getText();
+                String dataFim = txtDataTermino.getText();
+                String status = (String) comboStatus.getSelectedItem();
+                Usuario gerente = (Usuario) comboGerenteResponsavel.getSelectedItem();
+
+                if (nome.isEmpty() || gerente == null) {
                     JOptionPane.showMessageDialog(ProjectRegistrationFrame.this, "Por favor, preencha o nome do projeto e selecione um gerente.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(ProjectRegistrationFrame.this, "Projeto cadastrado com sucesso! (Simulação)");
+                    try {
+                        projetoController.cadastrarProjeto(nome, descricao, dataInicio, dataFim, status, gerente);
+                        JOptionPane.showMessageDialog(ProjectRegistrationFrame.this, "Projeto cadastrado com sucesso!");
+                        dispose();
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(ProjectRegistrationFrame.this, "Erro ao cadastrar projeto: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });

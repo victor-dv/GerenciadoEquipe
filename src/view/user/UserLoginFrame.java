@@ -1,5 +1,7 @@
 package view.user;
 
+import controller.LoginController;
+import model.Usuario;
 import view.menu.MainMenuView;
 
 import javax.swing.*;
@@ -13,8 +15,11 @@ public class UserLoginFrame extends JFrame {
     private JPasswordField txtSenha;
     private JButton btnEntrar;
     private JButton btnCancelar;
+    
+    private LoginController loginController;
 
     public UserLoginFrame() {
+        loginController = new LoginController();
         setTitle("Login de Usuário");
         setSize(350, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -66,9 +71,18 @@ public class UserLoginFrame extends JFrame {
                 if (login.isEmpty() || senha.isEmpty()) {
                     JOptionPane.showMessageDialog(UserLoginFrame.this, "Por favor, preencha todos os campos.", "Erro", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(UserLoginFrame.this, "Login realizado com sucesso!");
-                    new MainMenuView().setVisible(true);
-                    dispose();
+                    try {
+                        Usuario usuario = loginController.autenticar(login, senha);
+                        if (usuario != null) {
+                            JOptionPane.showMessageDialog(UserLoginFrame.this, "Bem-vindo, " + usuario.getNome() + "!");
+                            new MainMenuView(usuario).setVisible(true);
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(UserLoginFrame.this, "Login ou senha inválidos.", "Erro", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(UserLoginFrame.this, "Erro ao autenticar: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });

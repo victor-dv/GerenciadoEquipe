@@ -1,25 +1,48 @@
 package view.team;
 
+import controller.EquipeController;
+import controller.UsuarioController;
+import model.Usuario;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class TeamRegistrationFrame extends JFrame {
 
     private JTextField txtNomeEquipe;
     private JTextArea txtDescricao;
-    private JList<String> listUsuarios;
-    private DefaultListModel<String> listModel;
+    private JList<Usuario> listUsuarios;
+    private DefaultListModel<Usuario> listModel;
     private JButton btnCadastrar;
     private JButton btnCancelar;
+    
+    private EquipeController equipeController;
+    private UsuarioController usuarioController;
 
     public TeamRegistrationFrame() {
+        equipeController = new EquipeController();
+        usuarioController = new UsuarioController();
+        
         setTitle("Cadastro de Equipe");
         setSize(450, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        loadUsuarios();
+    }
+
+    private void loadUsuarios() {
+        try {
+            List<Usuario> usuarios = usuarioController.listarUsuarios();
+            for (Usuario u : usuarios) {
+                listModel.addElement(u);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao carregar usuários: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void initComponents() {
@@ -52,13 +75,6 @@ public class TeamRegistrationFrame extends JFrame {
         gbc.gridx = 1;
         
         listModel = new DefaultListModel<>();
-        // Simulação de usuários cadastrados no sistema
-        listModel.addElement("João Silva");
-        listModel.addElement("Maria Oliveira");
-        listModel.addElement("Pedro Santos");
-        listModel.addElement("Carla Ferreira");
-        listModel.addElement("Ricardo Lima");
-        
         listUsuarios = new JList<>(listModel);
         listUsuarios.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollList = new JScrollPane(listUsuarios);
@@ -89,12 +105,22 @@ public class TeamRegistrationFrame extends JFrame {
         btnCadastrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (txtNomeEquipe.getText().isEmpty()) {
+                String nome = txtNomeEquipe.getText();
+                String descricao = txtDescricao.getText();
+                List<Usuario> selecionados = listUsuarios.getSelectedValuesList();
+
+                if (nome.isEmpty()) {
                     JOptionPane.showMessageDialog(TeamRegistrationFrame.this, "Por favor, informe o nome da equipe.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                } else if (listUsuarios.getSelectedValuesList().isEmpty()) {
+                } else if (selecionados.isEmpty()) {
                     JOptionPane.showMessageDialog(TeamRegistrationFrame.this, "Selecione ao menos um membro para a equipe.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(TeamRegistrationFrame.this, "Equipe cadastrada com sucesso! (Simulação)");
+                    try {
+                        equipeController.cadastrarEquipe(nome, descricao, selecionados);
+                        JOptionPane.showMessageDialog(TeamRegistrationFrame.this, "Equipe cadastrada com sucesso!");
+                        dispose();
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(TeamRegistrationFrame.this, "Erro ao cadastrar equipe: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });

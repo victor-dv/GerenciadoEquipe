@@ -1,5 +1,7 @@
 package view.user;
 
+import controller.UsuarioController;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,8 +18,12 @@ public class UserRegistrationFrame extends JFrame {
     private JComboBox<String> comboTipoUsuario;
     private JButton btnCadastrar;
     private JButton btnCancelar;
+    
+    private UsuarioController usuarioController;
 
     public UserRegistrationFrame() {
+        usuarioController = new UsuarioController();
+        
         setTitle("Cadastro de Usuário");
         setSize(400, 450);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -95,11 +101,29 @@ public class UserRegistrationFrame extends JFrame {
 
         add(panel);
 
-        // Action Listeners básicos
+        // Action Listeners
         btnCadastrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(UserRegistrationFrame.this, "Usuário cadastrado com sucesso! (Simulação)");
+                String nome = txtNomeCompleto.getText();
+                String cpf = txtCPF.getText();
+                String email = txtEmail.getText();
+                String cargo = txtCargo.getText();
+                String login = txtLogin.getText();
+                String senha = new String(txtSenha.getPassword());
+                String perfil = (String) comboTipoUsuario.getSelectedItem();
+
+                if (nome.isEmpty() || login.isEmpty() || senha.isEmpty()) {
+                    JOptionPane.showMessageDialog(UserRegistrationFrame.this, "Por favor, preencha os campos obrigatórios (Nome, Login e Senha).", "Aviso", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    try {
+                        usuarioController.cadastrarUsuario(nome, email, cargo, cpf, login, senha, perfil);
+                        JOptionPane.showMessageDialog(UserRegistrationFrame.this, "Usuário cadastrado com sucesso!");
+                        dispose();
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(UserRegistrationFrame.this, "Erro ao cadastrar usuário: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         });
 

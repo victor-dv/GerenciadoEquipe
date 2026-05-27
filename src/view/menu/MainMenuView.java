@@ -1,5 +1,6 @@
 package view.menu;
 
+import model.Usuario;
 import view.project.ProjectRegistrationFrame;
 import view.team.TeamRegistrationFrame;
 import view.user.UserRegistrationFrame;
@@ -11,7 +12,7 @@ import java.awt.event.ActionListener;
 
 public class MainMenuView extends JFrame {
 
-    public MainMenuView() {
+    public MainMenuView(Usuario usuario) {
         setTitle("Sistema de Gerenciamento de Equipes - Menu Principal");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
