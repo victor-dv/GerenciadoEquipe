@@ -50,4 +50,9 @@ public class Projeto {
 
     public LocalDateTime getDataCadastro() { return dataCadastro; }
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
+
+    @Override
+    public String toString() {
+        return nome;
+    }
 }

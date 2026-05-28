@@ -2,8 +2,8 @@ package model;
 
 public enum StatusProjeto {
     PLANEJADO("Planejado"),
-    EM_ANDAMENTO("Em Andamento"),
-    CONCLUIDO("Concluído"),
+    EM_ANDAMENTO("Em_Andamento"),
+    CONCLUIDO("Concluido"),
     CANCELADO("Cancelado");
 
     private String descricao;

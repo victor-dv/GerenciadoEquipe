@@ -7,6 +7,7 @@ import model.Usuario;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class ProjetoController {
     private ProjetoDAO projetoDAO;
@@ -28,5 +29,8 @@ public class ProjetoController {
         p.setGerente(gerente);
         
         projetoDAO.create(p);
+    }
+    public List<Projeto> listarProjetos() throws Exception {
+        return projetoDAO.findAll();
     }
 }
